@@ -47,7 +47,7 @@ float4 PS(VOut input) : SV_TARGET
 	if (sin(input.texcoord.x*3.14) * sin(input.texcoord.y*3.14) < 0.05)
 	{
 		float v = sin(input.texcoord.x*3.14) * sin(input.texcoord.y*3.14);
-		float col = (1-v*10) / 14.5;
+		float col = (0.5-((1-v*10)*0.5))*0.25;
 		return float4(col,col,col,1);
 	}
 	return colour;

@@ -159,6 +159,12 @@ var Player = function()
 		}
 	}
 
+	this.setPos = function(x, y)
+	{
+		this._pos.x = x;
+		this._pos.y = y;
+	}
+
 	this.update = function(dt, walls)
 	{
 		this._updateMovement(dt);
