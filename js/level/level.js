@@ -47,6 +47,7 @@ var Level = function(camera)
 		{
 			this._editLevel = !this._editLevel;
 			this._camera.setZoom(1);
+			this._zoom = 1;
 		}
 		if (this._editLevel == true)
 		{
