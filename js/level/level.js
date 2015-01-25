@@ -12,24 +12,29 @@ var Level = function(camera)
 		this._walls = [];
 		this.resetPlayer();
 		this._segments = [];
-		this._numSegments = 2;
 		this._segmentWidth = 800;
 		this._editLevel = true;
 		this._mouseHeld = false;
 		this._startPoint = {x: 0, y: 0}
 		this._endPoint = {x: 0, y: 0}
+		this._zoom = 1;
 
-		for (var i = 0; i < this._numSegments; ++i)
+		this._camera.setZoom(this._zoom);
+
+		var curSegment = 0;
+		while(IO.fileExists("textures/level/segments/segment_" + curSegment + ".png"))
 		{
 			var segment = Quad2D.new();
-			segment.setTexture("textures/level/segments/segment_" + i + ".png");
+			segment.setTexture("textures/level/segments/segment_" + curSegment + ".png");
 			segment.setToTexture();
 			segment.spawn("Default");
-			segment.setTranslation(i * this._segmentWidth, 0, -1);
+			segment.setTranslation(curSegment * segment.textureMetrics().width, 0, -1);
 			segment.setOffset(0.5, 0.5);
 			segment.setSampling(Sampling.Point);
 			segment.setShader("shaders/segments.fx");
 			this._segments.push(segment);
+
+			++curSegment;
 		}
 
 		this.loadLevel();
@@ -41,6 +46,7 @@ var Level = function(camera)
 		if (Keyboard.isReleased("Q"))
 		{
 			this._editLevel = !this._editLevel;
+			this._camera.setZoom(1);
 		}
 		if (this._editLevel == true)
 		{
@@ -58,8 +64,8 @@ var Level = function(camera)
 		var pos = Mouse.position(Mouse.Relative);
 		var t = this._camera.translation();
 
-		var x = pos.x + t.x;
-		var y = pos.y  + t.y;
+		var x = pos.x / this._zoom + t.x;
+		var y = pos.y / this._zoom + t.y;
 
 		Line.draw(x - 2, y - 2, 0, 1, 0, 0, x + 2, y + 2, 0, 1, 0, 0);
 		Line.draw(x + 2, y - 2, 0, 1, 0, 0, x - 2, y + 2, 0, 1, 0, 0);
@@ -67,9 +73,19 @@ var Level = function(camera)
 		if (Mouse.isDown(0))
 		{
 			var movement = Mouse.movement();
-			var xx = -movement.x * 100 * dt;
-			var yy = movement.y * 100 * dt;
+			var xx = -movement.x * 100 * dt / this._zoom;
+			var yy = movement.y * 100 * dt / this._zoom;
 			this._camera.translateBy(xx, yy, 0);
+		}
+
+		if (Mouse.wheelDown())
+		{
+			this._camera.setZoom(this._zoom /= 1.2);
+		}
+
+		if (Mouse.wheelUp())
+		{
+			this._camera.setZoom(this._zoom *= 1.2);
 		}
 
 		if (Mouse.isPressed(1))
