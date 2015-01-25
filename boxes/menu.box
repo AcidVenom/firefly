@@ -1,0 +1,3 @@
+load("texture","textures/menu/background.png")
+load("texture","textures/menu/flare.png")
+load("texture","textures/menu/firefly.png")

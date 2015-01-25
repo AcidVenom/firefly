@@ -1,0 +1,4 @@
+load("texture","textures/character/character.png")
+load("texture","textures/character/character_arm.png")
+load("texture","textures/character/character_bag.png")
+load("texture","textures/character/character_eyes.png")
