@@ -3,13 +3,13 @@ var Player = function()
 	this._pos = new Vector2D(0, 0);
 
 	this._points = [
-		new Vector2D(-10, -10),
-		new Vector2D(10, -10),
+		new Vector2D(-10, -3),
+		new Vector2D(10, -3),
 		new Vector2D(-5, 0),
 		new Vector2D(5, 0),
-		new Vector2D(0, 0),
-		new Vector2D(-10, -64),
-		new Vector2D(10, -64)
+		new Vector2D(0, 1),
+		new Vector2D(-10, -32),
+		new Vector2D(10, -32)
 	]
 	this._origin = {
 		x: 0.5,
@@ -20,15 +20,20 @@ var Player = function()
 
 	this._gravity = 1500;
 	this._maxVelocity = 500;
-	this._jumpHeight = 500;
+	this._jumpHeight = 400;
 	this._friction = 0;
-	this._slopeOffset = 10;
+	this._slopeOffset = 1.2;
 
 	this._jump = false;
 
 	this._moveSpeed = {
 		acceleration: 600,
-		maxSpeed: 200
+		maxSpeed: 150
+	}
+
+	this.velocity = function()
+	{
+		return this._velocity;
 	}
 
 	this.initialise = function()
@@ -93,7 +98,7 @@ var Player = function()
 			this._velocity.x /= 5;
 		}
 
-		if (Keyboard.isDown("Up"))
+		if (Keyboard.isPressed("Up"))
 		{
 			if (this._jump == false)
 			{
@@ -149,8 +154,8 @@ var Player = function()
 							this._jump = false;
 						}
 
-						this._velocity.x -= x;
-						this._velocity.y -= y + this._slopeOffset;
+						this._velocity.x -= x * this._slopeOffset;
+						this._velocity.y -= y * this._slopeOffset;
 
 						break;
 					}

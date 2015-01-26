@@ -44,7 +44,7 @@ float4 PS(VOut input) : SV_TARGET
 
 	float4 textureColour = textures[0].Sample(Sampler, float2(x, y));
 	float4 colour = float4(textureColour.rgb * Blend * input.colour.rgb, textureColour.a);
-	colour.a *= Alpha * sin(y*3.14 + sin(x*3.14)/5)*1.9 * sin(x*3.14)/1.5;
+	colour.a *= Alpha * sin(y*3.14 + sin(x*3.14)/5)*1.9 * sin(x*3.14)/1.2;
 	
 	return colour;
 }
