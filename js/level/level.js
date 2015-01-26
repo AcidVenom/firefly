@@ -1,5 +1,7 @@
 require("js/level/player");
 require("js/level/wall");
+require("js/level/message");
+require("js/level/firefly");
 
 var Level = function(camera)
 {
@@ -12,12 +14,21 @@ var Level = function(camera)
 		this._walls = [];
 		this.resetPlayer();
 		this._segments = [];
+		this._triggers = [];
 		this._segmentWidth = 800;
 		this._editLevel = true;
 		this._mouseHeld = false;
 		this._startPoint = {x: 0, y: 0}
 		this._endPoint = {x: 0, y: 0}
 		this._zoom = 1;
+
+		this._texts = [
+			"This feels like a familiar place..",
+			"Hey! It's the [b]firefly![/b]\nIt's been quite a while.",
+			"You see [b]scafolds[/b] in the distance,\nresembling something that has yet\nto be built",
+			"On the horizon you catch a glimpse of a\nstructure that looks like an [b]Abbey[/b]",
+			"Enchanted environment sparkles around you..\n[b]Monks[/b] at the [b]Abbey[/b] made this magic happen."
+		]
 
 		this._camera.setZoom(this._zoom);
 
@@ -34,8 +45,17 @@ var Level = function(camera)
 			segment.setShader("shaders/segments.fx");
 			this._segments.push(segment);
 
+			var w = segment.textureMetrics().width;
+			var h = segment.textureMetrics().height;
+			var trigger = {x: curSegment * w + w / 2, y: h / 2, triggered: false}
+
+			this._triggers.push(trigger)
+
 			++curSegment;
 		}
+
+		this._message = new Message();
+		this._firefly = new Firefly();
 
 		this.loadLevel();
 		Log.debug("Initialised level");
@@ -55,8 +75,30 @@ var Level = function(camera)
 		}
 		else
 		{
+			if (this._triggers[1].triggered == true)
+			{
+				this._firefly.update(dt, this._player);
+			}
+			
+			this._message.update(dt);
 			this._player.update(dt, this._walls);
 			this._camera.setTranslation(this._player.translation().x, this._player.translation().y, 0);
+			
+			var trigger
+			for (var i = 0; i < this._triggers.length; ++i)
+			{
+				trigger = this._triggers[i];
+
+				if (trigger.triggered == false)
+				{
+					var p = this._player.pos();
+					if (Math.distance(p.x, p.y, trigger.x, trigger.y) < 600)
+					{
+						trigger.triggered = true;
+						this._message.show(this._texts[i]);
+					}
+				}
+			}
 		}
 	}
 
@@ -140,7 +182,7 @@ var Level = function(camera)
 
 	this.resetPlayer = function()
 	{
-		this._player = new Player();
+		this._player = new Player(this._camera);
 		this._player.update(0, this._walls);
 		Game.cleanUp();
 	}

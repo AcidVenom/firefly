@@ -1,4 +1,5 @@
 load("shader","shaders/segments.fx")
+load("texture","textures/menu/firefly.png")
 load("texture","textures/character/character.png")
 load("texture","textures/character/character_arm.png")
 load("texture","textures/character/character_bag.png")

@@ -1,6 +1,7 @@
-var Player = function()
+var Player = function(camera)
 {
 	this._pos = new Vector2D(0, 0);
+	this._camera = camera;
 
 	this._points = [
 		new Vector2D(-10, -3),
@@ -26,6 +27,8 @@ var Player = function()
 
 	this._jump = false;
 
+	this._armHeight = 25;
+
 	this._moveSpeed = {
 		acceleration: 600,
 		maxSpeed: 150
@@ -34,6 +37,11 @@ var Player = function()
 	this.velocity = function()
 	{
 		return this._velocity;
+	}
+
+	this.pos = function()
+	{
+		return this._pos;
 	}
 
 	this.initialise = function()
@@ -46,17 +54,55 @@ var Player = function()
 		this.setToTexture();
 		this.setOffset(this._origin.x, this._origin.y);
 		this.spawn("Default");
+		this.setSampling(Sampling.Point);
 
 		this._eyes = Quad2D.new();
 		this._eyes.setTexture("textures/character/character_eyes.png");
 		this._eyes.setToTexture();
 		this._eyes.setOffset(this._origin.x, this._origin.y);
 		this._eyes.spawn("Default");
+		this._eyes.setSampling(Sampling.Point);
+
+		this._arm = Quad2D.new();
+		this._arm.setTexture("textures/character/character_arm.png");
+		this._arm.setToTexture();
+		this._arm.setOffset(0.1, 0.5);
+		this._arm.spawn("Default");
+		this._arm.setSampling(Sampling.Point);
+
+		this._bag = Quad2D.new();
+		this._bag.setTexture("textures/character/character_bag.png");
+		this._bag.setToTexture();
+		this._bag.setOffset(this._origin.x, this._origin.y);
+		this._bag.spawn("Default");
+		this._bag.setSampling(Sampling.Point);
+
+		var frames = [];
+		var numFrames = 6;
+		var frameWidth = 48;
+		var frameHeight = 80;
+
+		for (var i = 0; i < numFrames; ++i)
+		{
+			frames.push({
+				x: i * frameWidth,
+				y: 0,
+				width: frameWidth,
+				height: frameHeight,
+				wait: 0
+			});
+		}
+
+		this.addAnimation("walk", "textures/character/character.png", frames);
+		this.setAnimation("walk");
+		this.setAnimationSpeed("walk", 0);
+		this.playAnimation("walk");
+
 	}
 
 	this._updateMovement = function(dt)
 	{
-		if (Keyboard.isDown("Right"))
+		if (Keyboard.isDown("D"))
 		{
 			this._velocity.x += this._moveSpeed.acceleration * dt;
 
@@ -66,7 +112,7 @@ var Player = function()
 			}
 		}
 
-		if (Keyboard.isDown("Left"))
+		if (Keyboard.isDown("A"))
 		{
 			this._velocity.x -= this._moveSpeed.acceleration * dt;
 
@@ -89,16 +135,57 @@ var Player = function()
 		this._pos.x += this._velocity.x * dt;
 		this._pos.y += this._velocity.y * dt;
 
-
-		this.setTranslation(this._pos.x, this._pos.y, 0);
-		this._eyes.setTranslation(this._pos.x, this._pos.y, 1);
-
-		if (!Keyboard.isDown("Left") && !Keyboard.isDown("Right"))
+		var wobble = 0;
+		if (this._velocity.x > 0.02 || this._velocity.x < 0.02)
 		{
-			this._velocity.x /= 5;
+			wobble = Math.sin(this._pos.x / 10) * 1;
 		}
 
-		if (Keyboard.isPressed("Up"))
+		this.setTranslation(this._pos.x, this._pos.y, 0);
+		this._eyes.setTranslation(this._pos.x, this._pos.y - 2 + wobble * -1.1, 1);
+		this._arm.setTranslation(this._pos.x, this._pos.y + wobble - this._armHeight, 1);
+		this._bag.setTranslation(this._pos.x, this._pos.y + wobble / 1.5, 1);
+
+		var mousePos = Mouse.position(Mouse.Relative);
+		var t = this._camera.translation();
+
+		var x1 = this._pos.x;
+		var y1 = this._pos.y - this._armHeight;
+
+		var x2 = mousePos.x + t.x;
+		var y2 = mousePos.y + t.y;
+
+		var angle = Math.atan2(y2 - y1, x2 - x1);
+
+		this._arm.setRotation(0, 0, angle);
+
+		angle = angle * 180 / Math.PI + 180;
+		if (angle < 270 && angle > 90)
+		{
+			this._arm.setScale(1, 1);
+		}
+		else
+		{
+			this._arm.setScale(1, -1);
+		}
+
+		if (!Keyboard.isDown("A") && !Keyboard.isDown("D"))
+		{
+			this._velocity.x /= 5;
+			this.setAnimationSpeed("walk", 0);
+			this.setFrame("walk", 0);
+		}
+		else
+		{
+			var scale = this._velocity.x / Math.abs(this._velocity.x);
+			this.setScale(scale, 1);
+			this._eyes.setScale(scale, 1);
+			this._bag.setScale(scale, 1);
+
+			this.setAnimationSpeed("walk", Math.abs(this._velocity.x / 40));
+		}
+
+		if (Keyboard.isPressed("W"))
 		{
 			if (this._jump == false)
 			{

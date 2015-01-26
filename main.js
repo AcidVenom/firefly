@@ -9,7 +9,8 @@ require("js/utility/sprite_animation");
 require("js/menu/menu_state");
 
 var RenderTargets = RenderTargets || {
-	default: RenderTarget.new("Default")
+	default: RenderTarget.new("Default"),
+	ui: RenderTarget.new("UI")
 }
 
 Game.Initialise = function()
@@ -38,6 +39,9 @@ Game.Initialise = function()
 	ContentManager.loadFont("fonts/dinpro.otfb", 48);
 	ContentManager.loadFont("fonts/dinpro.otfb", 64);
 	ContentManager.loadFont("fonts/dinpro.otfb", 72);
+
+	ContentManager.load("shader", "shaders/pp_normal.fx");
+	RenderTargets.ui.setShader("shaders/pp_normal.fx");
 
 	StateManager.switchState(MenuState);
 }
