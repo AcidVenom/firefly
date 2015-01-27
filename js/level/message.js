@@ -5,7 +5,7 @@ var Message = function()
 
 	this._timer = {
 		time: 0,
-		speed: 0.05
+		speed: 0.075
 	}
 
 	this.initialise = function()

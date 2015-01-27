@@ -56,13 +56,6 @@ var Player = function(camera)
 		this.spawn("Default");
 		this.setSampling(Sampling.Point);
 
-		this._eyes = Quad2D.new();
-		this._eyes.setTexture("textures/character/character_eyes.png");
-		this._eyes.setToTexture();
-		this._eyes.setOffset(this._origin.x, this._origin.y);
-		this._eyes.spawn("Default");
-		this._eyes.setSampling(Sampling.Point);
-
 		this._arm = Quad2D.new();
 		this._arm.setTexture("textures/character/character_arm.png");
 		this._arm.setToTexture();
@@ -142,7 +135,6 @@ var Player = function(camera)
 		}
 
 		this.setTranslation(this._pos.x, this._pos.y, 0);
-		this._eyes.setTranslation(this._pos.x, this._pos.y - 2 + wobble * -1.1, 1);
 		this._arm.setTranslation(this._pos.x, this._pos.y + wobble - this._armHeight, 1);
 		this._bag.setTranslation(this._pos.x, this._pos.y + wobble / 1.5, 1);
 
@@ -179,7 +171,6 @@ var Player = function(camera)
 		{
 			var scale = this._velocity.x / Math.abs(this._velocity.x);
 			this.setScale(scale, 1);
-			this._eyes.setScale(scale, 1);
 			this._bag.setScale(scale, 1);
 
 			this.setAnimationSpeed("walk", Math.abs(this._velocity.x / 40));

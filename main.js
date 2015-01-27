@@ -41,7 +41,13 @@ Game.Initialise = function()
 	ContentManager.loadFont("fonts/dinpro.otfb", 72);
 
 	ContentManager.load("shader", "shaders/pp_normal.fx");
+	
 	RenderTargets.ui.setShader("shaders/pp_normal.fx");
+
+	ContentManager.load("sound", "sounds/music.mp3");
+
+	SoundSystem.addChannelGroup("Music");
+	SoundSystem.play("sounds/music.mp3", "Music", true);
 
 	StateManager.switchState(MenuState);
 }

@@ -21,13 +21,35 @@ var Level = function(camera)
 		this._startPoint = {x: 0, y: 0}
 		this._endPoint = {x: 0, y: 0}
 		this._zoom = 1;
+		this._scrollspeed = 5;
+		this._textTimer = 0;
+		this._currentTrigger = 10;
 
 		this._texts = [
 			"This feels like a familiar place..",
-			"Hey! It's the [b]firefly![/b]\nIt's been quite a while.",
+			"Hey! It's the [b]firefly![/b]\nIt's been quite a while",
 			"You see [b]scafolds[/b] in the distance,\nresembling something that has yet\nto be built",
 			"On the horizon you catch a glimpse of a\nstructure that looks like an [b]Abbey[/b]",
-			"Enchanted environment sparkles around you..\n[b]Monks[/b] at the [b]Abbey[/b] made this magic happen."
+			"Enchanted environment sparkles around you..\n[b]Monks[/b] at the [b]Abbey[/b] made this magic happen",
+			"You also know of some monks\nwho made magic happen..\n..[b]divine[/b] even",
+			"They needed some help..\n..They chose [b]you[/b] eventually",
+			"All because of that firefly\nthat told you to [b]keep going[/b]",
+			"And mother of a [b]giant[/b], you did",
+			"And that's not just because I was\ncapable of doing so..",
+			".. But also because you've given\nme the space to [b]explore[/b]",
+			"You've given me a reason to\ncontinue doing what I do..",
+			"..To not let anything bring me down..",
+			"..To work like a [b]monk[/b]",
+			"I cannot express in words how\ngrateful I am for that one chance..",
+			"..I've experienced a form of kindness\nI've never really felt before",
+			"And that's the kindness of appreciation",
+			"Keep on going you all!\nBecause as everyone knows..",
+			".. After rain ..",
+			".. Comes sunshine",
+			"I'll pack my bags and go on a journey",
+			"A journey of a lifetime",
+			"Stay legendary, thank you",
+			"(Dáárk Sóls)"
 		]
 
 		this._camera.setZoom(this._zoom);
@@ -75,12 +97,35 @@ var Level = function(camera)
 		}
 		else
 		{
+			this._message.update(dt);
+
 			if (this._triggers[1].triggered == true)
 			{
 				this._firefly.update(dt, this._player);
 			}
+
+			if (this._triggers[9].triggered == true)
+			{
+				this._camera.translateBy(0, dt * this._scrollspeed, 0);
+				this._player.setAnimationSpeed("walk", 0);
+
+				if (this._textTimer < 1)
+				{
+					this._textTimer += dt * 0.15;
+				}
+				else
+				{
+					if (this._currentTrigger > this._texts.length-1)
+					{
+						return;
+					}
+					this._message.show(this._texts[this._currentTrigger]);
+					this._textTimer = 0;
+					this._currentTrigger++;
+				}
+				return;
+			}
 			
-			this._message.update(dt);
 			this._player.update(dt, this._walls);
 			this._camera.setTranslation(this._player.translation().x, this._player.translation().y, 0);
 			
@@ -92,7 +137,8 @@ var Level = function(camera)
 				if (trigger.triggered == false)
 				{
 					var p = this._player.pos();
-					if (Math.distance(p.x, p.y, trigger.x, trigger.y) < 600)
+					var triggerRadius = 500
+					if (Math.distance(p.x, p.y, trigger.x, trigger.y) < triggerRadius)
 					{
 						trigger.triggered = true;
 						this._message.show(this._texts[i]);
@@ -162,6 +208,7 @@ var Level = function(camera)
 		if (Keyboard.isReleased("P"))
 		{
 			this.resetPlayer();
+			this._locked = false;
 		}
 
 		if (Keyboard.isReleased("S"))
