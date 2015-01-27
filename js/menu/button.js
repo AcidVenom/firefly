@@ -33,7 +33,7 @@ var Button = function(text)
 
 	this.setOnReleased = function(func)
 	{
-		this._mouseArea.setOnReleased(func, this._button);
+		this._mouseArea.setOnReleased(func, this);
 	}
 
 	this.setTranslation = function(x, y, z)

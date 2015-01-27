@@ -16,21 +16,32 @@ var Menu = function()
 	}
 
 	this._timers = {
-		flare: {time: 0, speed: 0.75}
+		flare: {time: 0, speed: 0.75},
+		fade: {time: 0, speed: 0.75}
 	}
 
 	this._zIndex = {
 		background: 0,
 		flare: 1,
 		elements: 2,
-		firefly: 3
+		firefly: 3,
+		fade: 4
 	}
 
 	this._titleHeight = -200;
 	this._buttonHeight = 150;
 
+	this._fadeIn = true;
+
 	this.initialise = function()
 	{
+		this._fadeWidget = Widget.new();
+		this._fadeWidget.setSize(RenderSettings.resolution().w, RenderSettings.resolution().h);
+		this._fadeWidget.setBlend(0,0,0);
+		this._fadeWidget.setTranslation(0, 0, this._zIndex.fade);
+		this._fadeWidget.setOffset(0.5, 0.5);
+		this._fadeWidget.spawn("UI");
+
 		Log.info("Initialising menu");
 		Log.debug("Initialising menu background");
 		this._background = Widget.new();
@@ -69,6 +80,7 @@ var Menu = function()
 			button = new Button(buttonNames[i]);
 			button.setTranslation(0, this._buttonHeight + i * 40, this._zIndex.elements);
 			button.spawn("Default");
+			button.menu = this;
 
 			this._buttons.push(button);
 		}
@@ -77,7 +89,7 @@ var Menu = function()
 		{
 			if (button == 0)
 			{
-				StateManager.switchState(LevelState);
+				callee.menu.fadeOut();
 			}
 		});
 
@@ -97,6 +109,11 @@ var Menu = function()
 		Log.info("Initialised menu");
 	}
 
+	this.fadeOut = function()
+	{
+		this._fadeIn = false;
+	}
+
 	this.update = function(dt)
 	{
 		this._timers.flare.time += dt * this._timers.flare.speed;
@@ -113,6 +130,35 @@ var Menu = function()
 		this._title.setAlpha(r / 2 + 0.5);
 
 		this._firefly.update(dt);
+
+		if (this._fadeIn == true)
+		{
+			var t = this._timers.fade;
+
+			if (t.time < 1)
+			{
+				t.time += dt * t.speed;
+				this._fadeWidget.setAlpha((1-t.time));
+			}
+			else
+			{
+				this._fadeWidget.setAlpha(0);
+			}
+		}
+		else
+		{
+			var t = this._timers.fade;
+
+			if (t.time > 0)
+			{
+				t.time -= dt * t.speed;
+				this._fadeWidget.setAlpha((1-t.time));
+			}
+			else
+			{
+				StateManager.switchState(LevelState);
+			}
+		}
 	}
 
 	this.initialise();

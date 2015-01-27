@@ -16,7 +16,7 @@ var Level = function(camera)
 		this._segments = [];
 		this._triggers = [];
 		this._segmentWidth = 800;
-		this._editLevel = true;
+		this._editLevel = false;
 		this._mouseHeld = false;
 		this._startPoint = {x: 0, y: 0}
 		this._endPoint = {x: 0, y: 0}
@@ -24,6 +24,16 @@ var Level = function(camera)
 		this._scrollspeed = 5;
 		this._textTimer = 0;
 		this._currentTrigger = 10;
+
+		this._rain = Widget.new();
+		this._rain.setTexture("textures/level/rain.png");
+		this._rain.setShader("shaders/rain.fx");
+		this._rain.setToTexture();
+		this._rain.spawn("UI");
+		this._rain.setOffset(0.5, 0.5);
+		this._rain.setUniform("float2", "TexOffset", 0, 0);
+
+		this._rainOffset = {x: 0, y: 0}
 
 		this._texts = [
 			"This feels like a familiar place..",
@@ -97,6 +107,11 @@ var Level = function(camera)
 		}
 		else
 		{
+			this._rainOffset.x += dt * 0.4;
+			this._rainOffset.y += dt * -1.2;
+
+			this._rain.setUniform("float2", "TexOffset", this._rainOffset.x, this._rainOffset.y);
+
 			this._message.update(dt);
 
 			if (this._triggers[1].triggered == true)
@@ -112,6 +127,11 @@ var Level = function(camera)
 				if (this._textTimer < 1)
 				{
 					this._textTimer += dt * 0.15;
+
+					if (this._currentTrigger == 19)
+					{
+						this._rain.setAlpha(1 - this._textTimer);
+					}
 				}
 				else
 				{
@@ -125,6 +145,8 @@ var Level = function(camera)
 				}
 				return;
 			}
+
+			this._rain.setAlpha(1);
 			
 			this._player.update(dt, this._walls);
 			this._camera.setTranslation(this._player.translation().x, this._player.translation().y, 0);

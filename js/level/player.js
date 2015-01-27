@@ -63,6 +63,13 @@ var Player = function(camera)
 		this._arm.spawn("Default");
 		this._arm.setSampling(Sampling.Point);
 
+		this._light = Quad2D.new();
+		this._light.setTexture("textures/character/character_light.png");
+		this._light.setToTexture();
+		this._light.setOffset(-0.5, 0.5);
+		this._light.spawn("Default");
+		this._light.setSampling(Sampling.Point);
+
 		this._bag = Quad2D.new();
 		this._bag.setTexture("textures/character/character_bag.png");
 		this._bag.setToTexture();
@@ -136,7 +143,10 @@ var Player = function(camera)
 
 		this.setTranslation(this._pos.x, this._pos.y, 0);
 		this._arm.setTranslation(this._pos.x, this._pos.y + wobble - this._armHeight, 1);
+		this._light.setTranslation(this._pos.x, this._pos.y + wobble - this._armHeight, 1);
 		this._bag.setTranslation(this._pos.x, this._pos.y + wobble / 1.5, 1);
+
+		this._light.setAlpha(0.5 + Math.random());
 
 		var mousePos = Mouse.position(Mouse.Relative);
 		var t = this._camera.translation();
@@ -150,6 +160,7 @@ var Player = function(camera)
 		var angle = Math.atan2(y2 - y1, x2 - x1);
 
 		this._arm.setRotation(0, 0, angle);
+		this._light.setRotation(0, 0, angle);
 
 		angle = angle * 180 / Math.PI + 180;
 		if (angle < 270 && angle > 90)
